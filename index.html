@@ -74,6 +74,37 @@
         }
     }
 
+    form.onsubmit = (e) => {
+        e.preventDefault();
+
+        const fields = Array.from(form.children)
+            .filter((field) => (field.nodeName !== 'BUTTON') && (field.type !=='checkbox'));
+
+
+        let user = [];
+        fields.forEach(
+            (element) => user[element.getAttribute('name').toUpperCase()] = element.value
+        );
+        user['SOURCE_ID'] = sourceId;
+        user['TITLE'] = `${user['LAST_NAME']} ${user['NAME']}`
+
+        const url = encodeUrl(user);
+        request = makeRequest(url);
+        request.then((response) => {
+            console.log(user);
+            if (response.status !== null) {
+                alert("Спасибо, вы зарегистрированы на конференцию");
+                insertRow(
+                    `${user['LAST_NAME']} ${user['NAME']} ${user['SECOND_NAME']}`,
+                    user['COMPANY_TITLE'],
+                    user['COMMENTS']
+                )
+            } else {
+                alert("Произошла ошибка");
+            }
+        });
+    }
+
     const encodeUrl = (data) => {
         let url = new URL(`${bitrixURL}crm.lead.add.json`);
         for (let key in data) {
@@ -122,35 +153,7 @@
         })
     }
 
-    form.onsubmit = (e) => {
-        e.preventDefault();
-
-        const fields = Array.from(form.children)
-            .filter((field) => (field.nodeName !== 'BUTTON') && (field.type !=='checkbox'));
-
-
-        let user = [];
-        fields.forEach(
-            (element) => user[element.getAttribute('name').toUpperCase()] = element.value
-        );
-        user['SOURCE_ID'] = sourceId;
-
-        const url = encodeUrl(user);
-        request = makeRequest(url);
-        request.then((response) => {
-            console.log(user);
-            if (response.status !== null) {
-                alert("Спасибо, вы зарегистрированы на конференцию");
-                insertRow(
-                    `${user['LAST_NAME']} ${user['NAME']} ${user['SECOND_NAME']}`,
-                    user['COMPANY_TITLE'],
-                    user['COMMENTS']
-                )
-            } else {
-                alert("Произошла ошибка");
-            }
-        });
-    }
+    
 
     const getCol = (value) => {
         const col = document.createElement("td");
