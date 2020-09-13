@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>test</title>
+</head>
+<body>
+    
+    
+<table>
+    <thead>
+        <tr>
+            <td>Фио</td>
+            <td>Подразделение</td>
+            <td>Тема доклада</td>
+        </tr>
+    </thead>
+    <tbody id="lead_list"></tbody>
+</table>
+
+
+
+<a href="#win1">Добавить участника</a>
+
+<a href="#x" class="overlay" id="win1"></a>
+<div class="popup" id="popup">
+    <div onclick="show('none')" id="wrap"></div>
+    
+    <form id="add_lead">
+        <input type="text" name="name" placeholder="Имя">
+        <input type="text" name="last_name" placeholder="Фамилия">
+        <input type="text" name="second_name" placeholder="Отчество">
+        <input type="email" name="email" placeholder="Email">
+        <input type="phone" name="phone" placeholder="Телефон">
+        <input type="text" name="company_title" placeholder="Название компании">
+        <textarea name="comments" placeholder="Тема доклада"></textarea>
+        <button type="submit">Отправить форму</button>
+    </form>
+    <a class="close" title="Закрыть" href="#close"></a>
+</div>
+
+<script ENGINE="text/javascript">
+    // document.getElementById('zayavka-fahcize').style= "display: none !important";
+
+    const form = document.getElementById('add_lead');
+    const sourceId = "WEBFORM";
+    const bitrixURL = 'https://samsonindustries.bitrix24.ru/rest/1/fy23n63z93rk82tu/';
+    const popup = document.getElementById('popup')
+    
+
+    
+
+    const encodeUrl = (data) => {
+        let url = new URL(`${bitrixURL}crm.lead.add.json`);
+        for (let key in data) {
+            if (key === 'PHONE' || key === 'EMAIL') {
+                // Bitrix magic
+                let fieldName = `fields[${key}][n0]`;
+                url.searchParams.set(
+                    `${fieldName}[VALUE]`,
+                    data[key]
+                );
+                url.searchParams.set(
+                    `${fieldName}[VALUE_TYPE]`,
+                    'WORK'
+                );
+            } else {
+                url.searchParams.set('fields[' + key + ']', data[key])
+            }
+        }
+
+        return url;
+    }
+
+    const makeRequest = (url, method = 'POST') => {
+        return fetch(url, {
+            method: method,
+        }).then(response => {
+            if (response.status == 200) {
+                return response.json()
+            } else {
+                throw new Error(response.status);
+            }
+        });
+    }
+
+    const getLeads = () => {
+        request = makeRequest(bitrixURL + 'crm.lead.list.json');
+        request.then((leads) => {
+            console.log(leads);
+            leads.result.forEach((item) => {
+                insertRow(
+                    `${item.LAST_NAME} ${item.NAME} ${item.SECOND_NAME}`,
+                    item.COMPANY_TITLE,
+                    item.COMMENTS
+                )
+            })
+        })
+    }
+
+    form.onsubmit = (e) => {
+        e.preventDefault();
+
+        const fields = Array.from(form.children)
+            .filter((field) => field.nodeName !== 'BUTTON');
+
+        let user = [];
+        fields.forEach(
+            (element) => user[element.getAttribute('name').toUpperCase()] = element.value
+        );
+        user['SOURCE_ID'] = sourceId;
+
+        const url = encodeUrl(user);
+        request = makeRequest(url);
+        request.then((response) => {
+            console.log(user);
+            if (response.status !== null) {
+                alert("Спасибо, вы зарегистрированы на конференцию");
+                insertRow(
+                    `${user['LAST_NAME']} ${user['NAME']} ${user['SECOND_NAME']}`,
+                    user['COMPANY_TITLE'],
+                    user['COMMENTS']
+                )
+                popup.style.display = 'display: none'
+            } else {
+                alert("Произошла ошибка");
+            }
+        });
+    }
+
+    const getCol = (value) => {
+        const col = document.createElement("td");
+        col.appendChild(document.createTextNode(value));
+        return col;
+    }
+
+    const insertRow = (name, company, comment) => {
+        const list = document.getElementById('lead_list');
+        const row = document.createElement("tr");
+        row.appendChild(getCol(name));        
+        row.appendChild(getCol(company));        
+        row.appendChild(getCol(comment));        
+        list.appendChild(row);
+    }
+
+    
+     
+    function show(state)
+    {
+    document.getElementById('wrap').style.display = state;
+    }
+     
+    function explode(){
+    document.getElementById('wrap').style= "display: block";
+    }
+
+    getLeads();
+    </script>
+</body>
+</html>
