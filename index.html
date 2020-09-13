@@ -20,37 +20,59 @@
     <tbody id="lead_list"></tbody>
 </table>
 
+<button id="btn_modal_window">Открыть</button>
 
-
-<a href="#win1">Добавить участника</a>
-
-<a href="#x" class="overlay" id="win1"></a>
-<div class="popup" id="popup">
-    <div onclick="show('none')" id="wrap"></div>
-    
-    <form id="add_lead">
-        <input type="text" name="name" placeholder="Имя">
-        <input type="text" name="last_name" placeholder="Фамилия">
-        <input type="text" name="second_name" placeholder="Отчество">
-        <input type="email" name="email" placeholder="Email">
-        <input type="phone" name="phone" placeholder="Телефон">
-        <input type="text" name="company_title" placeholder="Название компании">
-        <textarea name="comments" placeholder="Тема доклада"></textarea>
-        <button type="submit">Отправить форму</button>
-    </form>
-    <a class="close" title="Закрыть" href="#close"></a>
+<div class="modal" id="mymodal">
+    <div class="modal_content">
+        <span class="close_modal_window">X</span>
+        <form id="add_lead">
+            <input type="text" name="name" placeholder="Имя">
+            <input type="text" name="last_name" placeholder="Фамилия">
+            <input type="text" name="second_name" placeholder="Отчество">
+            <input type="email" name="email" placeholder="Email">
+            <input type="phone" name="phone" placeholder="Телефон">
+            <input type="text" name="company_title" placeholder="Название компании">
+            <input type="checkbox" id="check" onchange='theme()'>
+            <input type="text" name="comments" placeholder="Тема доклада" id="topic" style="display: none;">
+            <button type="submit">Отправить форму</button>
+        </form>
+    </div>
 </div>
 
 <script ENGINE="text/javascript">
-    // document.getElementById('zayavka-fahcize').style= "display: none !important";
+
+    let modal = document.getElementById('mymodal')
+    let btn = document.getElementById('btn_modal_window')
+    let close = document.getElementsByClassName('close_modal_window')[0]
+
+    btn.onclick = () => {
+        modal.style.display = "block"
+    }
+    close.onclick = () => {
+        modal.style.display = "none"
+    }
+
+    window.onclick = () => {
+        if(event.target == modal) {
+            modal.style.display = "none"
+        }
+    }
+    
 
     const form = document.getElementById('add_lead');
     const sourceId = "WEBFORM";
     const bitrixURL = 'https://samsonindustries.bitrix24.ru/rest/1/fy23n63z93rk82tu/';
     const popup = document.getElementById('popup')
     
-
     
+    let theme = () => {
+        let checkBox = document.getElementById('check')
+        if (checkBox.checked == true) {
+            document.getElementById('topic').style.display = "inline-block"
+        } else {
+            document.getElementById('topic').style.display = 'none'
+        }
+    }
 
     const encodeUrl = (data) => {
         let url = new URL(`${bitrixURL}crm.lead.add.json`);
@@ -104,7 +126,8 @@
         e.preventDefault();
 
         const fields = Array.from(form.children)
-            .filter((field) => field.nodeName !== 'BUTTON');
+            .filter((field) => (field.nodeName !== 'BUTTON') && (field.type !=='checkbox'));
+
 
         let user = [];
         fields.forEach(
@@ -123,7 +146,6 @@
                     user['COMPANY_TITLE'],
                     user['COMMENTS']
                 )
-                popup.style.display = 'display: none'
             } else {
                 alert("Произошла ошибка");
             }
@@ -145,16 +167,6 @@
         list.appendChild(row);
     }
 
-    
-     
-    function show(state)
-    {
-    document.getElementById('wrap').style.display = state;
-    }
-     
-    function explode(){
-    document.getElementById('wrap').style= "display: block";
-    }
 
     getLeads();
     </script>
