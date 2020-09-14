@@ -4,6 +4,22 @@ body {
     justify-content: center;
     align-items: center;
 }
+table {
+    margin-bottom: 50px;
+}
+
+table,th, tr, td { 
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: lightblue;
+}
+
+tbody tr:nth-of-type(2n-1) {
+    background-color: lightgrey;
+}
 
 .modal {
     display: none;
@@ -26,19 +42,30 @@ body {
     z-index: 20;
     margin: 0;
     width: 85%;
-    min-width: 320px;
-    max-width: 600px;
+    min-width: 120px;
+    max-width: 300px;
     position: fixed;
     padding: 15px;
     border: 1px solid #383838;
     background: #fefefe;
+    border-radius: 10px;
 }
 
 .close_modal_window {
-    color: #000;
+    color: white;
     float: right;
     font-size: 30px;
     cursor: pointer;
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: rgb(5, 91, 204);
+    cursor: pointer;
+    border-radius: 50%;
+    position: fixed;
+    top: -20px;
+    right: -20px;
 }
 
 #add_lead {
@@ -46,3 +73,24 @@ body {
     flex-direction: column;
 }
 
+.error {
+    color: red;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+input {
+    border: 1px solid black;
+    border-radius: 10px;
+    height: 20px;
+    padding: 5px;
+}
+
+
+.button {
+    height: 40px;
+    background-color: rgb(5, 91, 204);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}

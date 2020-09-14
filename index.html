@@ -12,166 +12,41 @@
 <table>
     <thead>
         <tr>
-            <td>Фио</td>
-            <td>Подразделение</td>
-            <td>Тема доклада</td>
+            <th>Фио</th>
+            <th>Подразделение</th>
+            <th>Тема доклада</th>
         </tr>
     </thead>
     <tbody id="lead_list"></tbody>
 </table>
 
-<button id="btn_modal_window">Открыть</button>
+<button id="btn_modal_window">Добавить участника</button>
 
 <div class="modal" id="mymodal">
     <div class="modal_content">
-        <span class="close_modal_window">X</span>
+        <span class="close_modal_window">x</span>
         <form id="add_lead">
             <input type="text" name="name" placeholder="Имя">
+            <div class="error" id="error-name"></div>
             <input type="text" name="last_name" placeholder="Фамилия">
+            <div class="error" id="error-last_name"></div>
             <input type="text" name="second_name" placeholder="Отчество">
-            <input type="email" name="email" placeholder="Email">
-            <input type="phone" name="phone" placeholder="Телефон">
+            <div class="error" id="error-second_name"></div>
+            <input type="email" name="email" placeholder="Email" id="email">
+            <div class="error" id="error-email"></div>
+            <input type="phone" name="phone" placeholder="Телефон" id="phone">
+            <div class="error" id="error-phone"></div>
             <input type="text" name="company_title" placeholder="Название компании">
-            <input type="checkbox" id="check" onchange='theme()'>
+            <div class="error" id="error-company_title"></div>
+            <input type="checkbox" id="check" onchange='theme()'>Хочу быть докладчиком
             <input type="text" name="comments" placeholder="Тема доклада" id="topic" style="display: none;">
-            <button type="submit">Отправить форму</button>
+            <div class="error" id="error-comments"></div>
+            <button class="button" type="submit">Отправить заявку</button>
         </form>
     </div>
 </div>
 
-<script ENGINE="text/javascript">
-
-    let modal = document.getElementById('mymodal')
-    let btn = document.getElementById('btn_modal_window')
-    let close = document.getElementsByClassName('close_modal_window')[0]
-
-    btn.onclick = () => {
-        modal.style.display = "block"
-    }
-    close.onclick = () => {
-        modal.style.display = "none"
-    }
-
-    window.onclick = () => {
-        if(event.target == modal) {
-            modal.style.display = "none"
-        }
-    }
-    
-
-    const form = document.getElementById('add_lead');
-    const sourceId = "WEBFORM";
-    const bitrixURL = 'https://samsonindustries.bitrix24.ru/rest/1/fy23n63z93rk82tu/';
-    const popup = document.getElementById('popup')
-    
-    
-    let theme = () => {
-        let checkBox = document.getElementById('check')
-        if (checkBox.checked == true) {
-            document.getElementById('topic').style.display = "inline-block"
-        } else {
-            document.getElementById('topic').style.display = 'none'
-        }
-    }
-
-    form.onsubmit = (e) => {
-        e.preventDefault();
-
-        const fields = Array.from(form.children)
-            .filter((field) => (field.nodeName !== 'BUTTON') && (field.type !=='checkbox'));
-
-
-        let user = [];
-        fields.forEach(
-            (element) => user[element.getAttribute('name').toUpperCase()] = element.value
-        );
-        user['SOURCE_ID'] = sourceId;
-        user['TITLE'] = `${user['LAST_NAME']} ${user['NAME']}`
-
-        const url = encodeUrl(user);
-        request = makeRequest(url);
-        request.then((response) => {
-            console.log(user);
-            if (response.status !== null) {
-                alert("Спасибо, вы зарегистрированы на конференцию");
-                insertRow(
-                    `${user['LAST_NAME']} ${user['NAME']} ${user['SECOND_NAME']}`,
-                    user['COMPANY_TITLE'],
-                    user['COMMENTS']
-                )
-            } else {
-                alert("Произошла ошибка");
-            }
-        });
-    }
-
-    const encodeUrl = (data) => {
-        let url = new URL(`${bitrixURL}crm.lead.add.json`);
-        for (let key in data) {
-            if (key === 'PHONE' || key === 'EMAIL') {
-                // Bitrix magic
-                let fieldName = `fields[${key}][n0]`;
-                url.searchParams.set(
-                    `${fieldName}[VALUE]`,
-                    data[key]
-                );
-                url.searchParams.set(
-                    `${fieldName}[VALUE_TYPE]`,
-                    'WORK'
-                );
-            } else {
-                url.searchParams.set('fields[' + key + ']', data[key])
-            }
-        }
-
-        return url;
-    }
-
-    const makeRequest = (url, method = 'POST') => {
-        return fetch(url, {
-            method: method,
-        }).then(response => {
-            if (response.status == 200) {
-                return response.json()
-            } else {
-                throw new Error(response.status);
-            }
-        });
-    }
-
-    const getLeads = () => {
-        request = makeRequest(bitrixURL + 'crm.lead.list.json');
-        request.then((leads) => {
-            console.log(leads);
-            leads.result.forEach((item) => {
-                insertRow(
-                    `${item.LAST_NAME} ${item.NAME} ${item.SECOND_NAME}`,
-                    item.COMPANY_TITLE,
-                    item.COMMENTS
-                )
-            })
-        })
-    }
-
-    
-
-    const getCol = (value) => {
-        const col = document.createElement("td");
-        col.appendChild(document.createTextNode(value));
-        return col;
-    }
-
-    const insertRow = (name, company, comment) => {
-        const list = document.getElementById('lead_list');
-        const row = document.createElement("tr");
-        row.appendChild(getCol(name));        
-        row.appendChild(getCol(company));        
-        row.appendChild(getCol(comment));        
-        list.appendChild(row);
-    }
-
-
-    getLeads();
-    </script>
+<script src="./node_modules/validator/validator.min.js"></script>
+<script src="index.js" ENGINE="text/javascript" ></script>
 </body>
 </html>
