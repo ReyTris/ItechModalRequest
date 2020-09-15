@@ -53,6 +53,7 @@ const isValidForm = (user) => {
     const errorContainers = Array.from(document.querySelectorAll('#add_lead div'));
     errorContainers.forEach((item) => item.innerText = '')
 
+    
     let isValid = true;
     let errors = {};
     for (let item in user) {
@@ -71,12 +72,12 @@ const isValidForm = (user) => {
                         }
                         break;
                     case 'alpha':
-                        if(!validator.isAlpha(user[item], 'ru-RU') && user[item].length > 0) {
+                        if(((!validator.isAlpha(user[item], 'en-US'))&&(!validator.isAlpha(user[item], 'ru-RU'))) && user[item].length > 0) {
                             errors[key] = rule;
                         }
                         break;
                     case 'phone':
-                        if (!validator.isMobilePhone(user[item], 'ru-RU')) {
+                        if (!validator.isMobilePhone(user[item], 'ru-RU' )) {
                             errors[key] = rule;
                         }
                         break;
@@ -90,6 +91,7 @@ const isValidForm = (user) => {
         }
     }
 
+    
     
 
     if (Object.keys(errors).length > 0) {
@@ -117,10 +119,16 @@ form.onsubmit = (e) => {
     );
     user['SOURCE_ID'] = sourceId;
     user['TITLE'] = `${user['LAST_NAME']} ${user['NAME']}`
-    
-    if (!isValidForm(user)) {
-        return;
+
+    if (isValidForm(user)) {
+        modal.style.display = 'none'
+    } else {
+        return
     }
+    
+    // if (!isValidForm(user)) {
+    //     return;
+    // }
 
     const url = encodeUrl(user);
     request = makeRequest(url);
